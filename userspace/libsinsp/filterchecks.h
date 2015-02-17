@@ -308,6 +308,7 @@ public:
 		TYPE_TOTIOBYTES = 27,
 		TYPE_LATENCY = 28,
 		TYPE_TOTLATENCY = 29,
+		TYPE_PREEXISTING = 30,
 	};
 
 	sinsp_filter_check_thread();
@@ -321,6 +322,7 @@ private:
 	int32_t extract_arg(string fldname, string val, OUT const struct ppm_param_info** parinfo);
 	inline bool compare_full_apid(sinsp_evt *evt);
 	bool compare_full_aname(sinsp_evt *evt);
+	bool compare_preexisting(sinsp_evt *evt);
 
 	int32_t m_argid;
 	uint32_t m_tbool;

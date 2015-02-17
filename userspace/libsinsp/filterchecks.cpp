@@ -832,6 +832,8 @@ const filtercheck_field_info sinsp_filter_check_thread_fields[] =
 	{PT_UINT64, EPF_NONE, PF_DEC, "proc.vmsize", "total virtual memory for the process (as kb)."},
 	{PT_UINT64, EPF_NONE, PF_DEC, "proc.vmrss", "resident non-swapped memory for the process (as kb)."},
 	{PT_UINT64, EPF_NONE, PF_DEC, "proc.vmswap", "swapped memory for the process (as kb)."},
+  // would be better as a PF_BOOL, but that doesn't exist yet
+	{PT_CHARBUF, EPF_NONE, PF_NA, "proc.preexisting", "did process exist prior to start of trace."},
 	{PT_UINT64, EPF_NONE, PF_DEC, "thread.pfmajor", "number of major page faults since thread start."},
 	{PT_UINT64, EPF_NONE, PF_DEC, "thread.pfminor", "number of minor page faults since thread start."},
 	{PT_INT64, EPF_NONE, PF_DEC, "thread.tid", "the id of the thread generating the event."},
@@ -1430,6 +1432,19 @@ bool sinsp_filter_check_thread::compare_full_aname(sinsp_evt *evt)
 	return false;
 }
 
+bool sinsp_filter_check_thread::compare_preexisting(sinsp_evt *evt)
+{
+	sinsp_threadinfo* tinfo = evt->get_thread_info();
+
+	//if(tinfo->duration >= evt->reltime)
+	if(tinfo->m_clone_ts < evt->m_first_ts)
+	{
+		return true;
+	}
+
+	return false;
+}
+
 bool sinsp_filter_check_thread::compare(sinsp_evt *evt)
 {
 	if(m_field_id == TYPE_APID)
@@ -1444,6 +1459,13 @@ bool sinsp_filter_check_thread::compare(sinsp_evt *evt)
 		if(m_argid == -1)
 		{
 			return compare_full_aname(evt);
+		}
+	}
+	else if(m_field_id == TYPE_PREEXISTING)
+	{
+		if(m_argid == -1)
+		{
+			return compare_preexisting(evt);
 		}
 	}
 
