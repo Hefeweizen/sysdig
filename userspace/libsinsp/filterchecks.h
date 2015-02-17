@@ -129,6 +129,7 @@ protected:
 	filter_check_info m_info;
 	uint32_t m_field_id;
 	uint32_t m_th_state_id;
+	uint32_t m_th_preexisting;
 	uint32_t m_val_storage_len;
 
 private:
