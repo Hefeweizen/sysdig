@@ -938,6 +938,14 @@ int32_t sinsp_filter_check_thread::parse_field_name(const char* str)
 
 		return res;
 	}
+	else if(string(val, 0, sizeof("proc.preexisting") - 1) == "proc.preexisting")
+	{
+		//
+		// Allocate thread storage for the state
+		//
+		m_th_preexisting = m_inspector->reserve_thread_memory(sizeof(bool));
+		return sinsp_filter_check::parse_field_name(str);
+	}
 	else if(string(val, 0, sizeof("thread.totexectime") - 1) == "thread.totexectime")
 	{
 		//
@@ -1436,13 +1444,7 @@ bool sinsp_filter_check_thread::compare_preexisting(sinsp_evt *evt)
 {
 	sinsp_threadinfo* tinfo = evt->get_thread_info();
 
-	//if(tinfo->duration >= evt->reltime)
-	if(tinfo->m_clone_ts < evt->m_first_ts)
-	{
-		return true;
-	}
-
-	return false;
+	return tinfo->get_private_state(m_th_preexisting);
 }
 
 bool sinsp_filter_check_thread::compare(sinsp_evt *evt)
